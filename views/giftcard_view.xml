@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+
+        <record model="ir.ui.view" id="ies_product_giftcard_tree">
+            <field name="name">ies_product_giftcard_tree</field>
+            <field name="model">product.coupon</field>
+            <field name="arch" type="xml">
+                <tree string="Gift Cards" create="false"
+                      colors="grey:state in ('r');blue:state in ('o');black:state in ('s');red:state in ('e')">
+                    <field name="name"/>
+                    <field name="amount"/>
+                    <field name="rem_amount"/>
+                    <field name="sale_price"/>
+                    <field name="create_date"/>
+                    <field name="single_use"/>
+                    <field name="sale_date"/>
+                    <field name="printed"/>
+                    <field name="expire_date"/>
+                    <field name="state"/>
+                    <field name="product_id"/>
+                    <field name="type"/>
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="ies_product_giftcard_form">
+            <field name="name">ies_product_giftcard_form</field>
+            <field name="model">product.coupon</field>
+            <field name="arch" type="xml">
+                <form string="Giftcards" create="false" edit='false'>
+                    <header>
+                        <field name="state" widget="statusbar" readonly='1'/>
+                    </header>
+                    <sheet>
+
+                        <div class="oe_title">
+                            <label class="oe_edit_only" for="name"
+                                string="Coupon Name" />
+                            <h1>
+                                <field name="type" readonly='1'/> /
+                                <field name="name" placeholder="Coupon Name" readonly='1'/>
+                            </h1>
+
+                            <div name="options">
+                                <div>
+                                    <field name="printed" />
+                                    <label for="printed" />
+                                    <field name="single_use" />
+                                    <label for="single_use" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <group>
+                            <group>
+                                <field name="partner_id" attrs="{'invisible': [('partner_id', '=', False)]}"/>
+                                <field name="amount" />
+                                <field name="rem_amount" />
+                                <field name="product_id" />
+                                <field name="pos_order_id"  attrs="{'invisible': [('pos_order_id', '=', False)]}"/>
+                            </group>
+                            <group>
+                                <field name="create_date" />
+                                <field name="sale_date" />
+                                <!-- <field name="reedem_date" /> -->
+                                <field name="expire_date" />
+                            </group>
+                        </group>
+
+                        <notebook>
+                            <page string='Reedem History' name='reedem_history'>
+                                <field name='reedem_ids'>
+                                   <tree>
+                                        <field name="order_id" />
+                                        <field name="amount" />
+                                        <field name="shop_id" />
+                                        <field name="date" />
+                                   </tree>
+                                </field>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+
+        <record model="ir.ui.view" id="ies_product_template_giftcard_form">
+            <field name="name">ies.product.template.giftcard.form</field>
+            <field name="model">product.template</field>
+            <field name="inherit_id" ref="ies_base_redeem.ies_product_template_common_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//div[@name='button_box']" position="inside">
+                    <button name="open_giftcards" type="object"
+                        class="oe_stat_button" icon="fa-ticket"
+                        attrs="{'invisible': [('giftcard_count', '=', 0), ]}"
+                        context="{'type':'gc'}">
+                        <field string="Giftcards"
+                            name="giftcard_count" widget="statinfo" />
+
+                    </button>
+                </xpath>
+
+                <!--<xpath expr="//field[@name='discount_type']" position="after">-->
+                    <!--<field name="discount_amount"-->
+                        <!--attrs="{'readonly': [('generated', '=', True)], 'invisible': ['|', ('discount_type', 'in', ['d', 'p']), ('discount_type', '=', False)],-->
+                        <!--'required': [('discount_type', '=', 'f')]}" />-->
+                <!--</xpath>-->
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="action_product_coupons_fix">
+            <field name="name">Sale Coupons</field>
+            <field name="res_model">product.coupon</field>
+            <field name="view_mode">tree</field>
+            <field name="domain">[('product_id', '=', active_id),
+                ('type', '=', 'f')]
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="action_product_coupons_per">
+            <field name="name">Sale Coupons</field>
+            <field name="res_model">product.coupon</field>
+            <field name="view_mode">tree</field>
+            <field name="domain">[('product_id', '=', active_id),
+                ('type', '=', 'p')]
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="action_sale_giftcard">
+            <field name="name">Gift Cards</field>
+            <field name="res_model">product.template</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[('is_coupon', '=', True), ('discount_type', 'in', ['f', 'd']), ('giftcard', '=', 1)]</field>
+            <field name="context">{'default_is_coupon':1, 'default_giftcard':1, 'giftcard':1, 'hide_discount_amount':0}</field>
+        </record>
+
+        <record id="action_sale_giftcard_view_tree" model="ir.actions.act_window.view">
+            <field eval="1" name="sequence" />
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="ies_base_redeem.ies_product_template_coupon_tree" />
+            <field name="act_window_id" ref="action_sale_giftcard" />
+        </record>
+
+        <record id="action_sale_giftcard_view_form" model="ir.actions.act_window.view">
+            <field eval="2" name="sequence" />
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="ies_base_redeem.ies_product_template_common_form" />
+            <field name="act_window_id" ref="action_sale_giftcard" />
+        </record>
+
+        <menuitem id="menu_sale_giftcard" name="Gift Cards"
+            parent='point_of_sale.menu_point_root'/>
+
+        <menuitem id="menu_sale_giftcard_conf" name="Templates"
+            parent='menu_sale_giftcard' action="action_sale_giftcard"
+            sequence='1' />
+
+        <record model="ir.actions.act_window" id="menu_action_giftcard">
+            <field name="name">Giftcards</field>
+            <field name="res_model">product.coupon</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[('coupon_type', '=', 'gc'), ('type', 'in', ['f', 'd'])]</field>
+            <field name="help" type="html">
+                <p>
+                    No Giftcard has been generated!
+                </p>
+                <p>
+                    To generate Giftcards, Please Create new giftcard template and
+                    generate fixed price giftcards.
+                </p>
+            </field>
+        </record>
+
+        <record id="menu_action_giftcard_view" model="ir.actions.act_window.view">
+            <field eval="1" name="sequence" />
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="ies_product_giftcard_tree" />
+            <field name="act_window_id" ref="menu_action_giftcard" />
+        </record>
+
+        <record id="menu_action_giftcard_form_view" model="ir.actions.act_window.view">
+            <field eval="2" name="sequence" />
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="ies_product_giftcard_form" />
+            <field name="act_window_id" ref="menu_action_giftcard" />
+        </record>
+
+        <menuitem id="menu_fixed_giftcard" name="Gift Cards"
+            parent='menu_sale_giftcard' action="menu_action_giftcard"
+            sequence='2' />
+
+
+
+    </data>
+</odoo>
