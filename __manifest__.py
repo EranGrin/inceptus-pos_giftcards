@@ -17,7 +17,7 @@
     'category': 'POS',
     'version': '1.0',
 
-    'depends': ['ies_base_redeem', 'ies_base'],
+    'depends': ['inceptus-base_redeem', 'inceptus-base'],
 
     'data': [
         'views/giftcard_view.xml',
